@@ -1,0 +1,40 @@
+body {
+  -webkit-print-color-adjust: exact !important;
+}
+
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.input {
+  display: block;
+  margin: 0.5rem auto 1rem;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: 150px 150px 150px 150px 150px;
+  margin: 0 auto;
+  padding: 2px;
+  background-color: black;
+  max-width: 750px;
+}
+
+.tile {
+  background-color: white;
+  border: 1px solid black;
+  padding: 1rem;
+  margin: 1px;
+  height: 144px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+@media print {
+  .page-break {
+    page-break-before: always;
+  } /* page-break-after works, as well */
+}
