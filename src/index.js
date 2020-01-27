@@ -63,7 +63,8 @@ function App() {
     const response = await fetch(request, { headers });
     if (response.ok) {
       const data = await response.json();
-      const artists = data.items.reduce((prev, curr) => {
+      const tracks = data.items || data.tracks.items || [];
+      const artists = tracks.reduce((prev, curr) => {
         if (curr.track) {
           const artists = curr.track.artists.map(element => element.name);
           prev.push(artists.join(', '));
