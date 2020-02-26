@@ -45,6 +45,12 @@ function App() {
     sessionStorage.setItem('numberOfCards', numberOfCards);
   }, [numberOfCards]);
 
+  function getPlaylistId(url) {
+    // TODO: Check if url is valid
+    const [,playlistId] = url.match(/playlist\/([^#?]+)/);
+    setPlaylistId(playlistId);
+  }
+
   return (
     <div className="App">
       {generateCard ? (
@@ -65,7 +71,7 @@ function App() {
             }
           }}>
             <label htmlFor="playlist-id">Playlist ID</label>
-            <input id="playlist-id" className="input" type="text" onChange={e => setPlaylistId(e.target.value)} required/>
+            <input id="playlist-id" className="input" type="url" onChange={e => getPlaylistId(e.target.value)} required/>
             <label htmlFor="edition">Type of Bingo</label>
             <input id="edition" className="input" type="text" onChange={e => setEdition(e.target.value)} />
             <label htmlFor="number-of-cards">Number of Unique Cards to Generate</label>
