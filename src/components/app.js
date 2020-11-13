@@ -10,6 +10,7 @@ function App() {
   );
   const [titles, setTitles] = useState([]);
   const [tileTitle, setTileTitle] = useState('artist');
+  const [showCovers, setShowCovers] = useState(false);
 
   async function fetchPlaylist(token) {
     const request = new Request(
@@ -25,12 +26,25 @@ function App() {
       const tracks = data.items || data.tracks.items || [];
       const artists = tracks.reduce((prev, curr) => {
         if (curr.track) {
-          if (tileTitle === 'track') {
-            prev.push(curr.track.name);
-          } else {
-            const artists = curr.track.artists.map((element) => element.name);
-            prev.push(artists.join(', '));
+          const foo = {};
+          debugger;
+          if (tileTitle !== 'no-title') {
+            if (tileTitle === 'track') {
+              foo.title = curr.track.name;
+            } else {
+              const artists = curr.track.artists.map((element) => element.name);
+              foo.title = artists.join(', ');
+            }
           }
+          if (showCovers) {
+            foo.image =
+              (curr.track.album &&
+                curr.track.album.images &&
+                curr.track.album.images &&
+                curr.track.album.images[0].url) ||
+              '';
+          }
+          prev.push(foo);
         }
         return prev;
       }, []);
@@ -89,7 +103,7 @@ function App() {
               }
             }}
           >
-            <label htmlFor="playlist-id">Playlist ID</label>
+            <label htmlFor="playlist-id">Playlist URL</label>
             <input
               id="playlist-id"
               className="input"
@@ -119,9 +133,21 @@ function App() {
                 value={tileTitle}
                 onChange={({ target }) => setTileTitle(target.value)}
               >
+                <option value="no-title">--No title--</option>
                 <option value="artist">Artist</option>
                 <option value="track">Track</option>
               </select>
+            </div>
+            <div>
+              <label>
+                Show album cover:
+                <input
+                  name="showCovers"
+                  type="checkbox"
+                  checked={showCovers}
+                  onChange={({ target }) => setShowCovers(target.checked)}
+                />
+              </label>
             </div>
             <button type="submit">Generate {numberOfCards} cards</button>
           </form>
@@ -136,10 +162,19 @@ function generateRandomContent(usedNums, titles) {
   do {
     newNum = Math.floor(Math.random() * Math.floor(titles.length));
   } while (usedNums[newNum]);
-
   usedNums[newNum] = true;
   if (titles[newNum]) {
-    return <div className="title">{titles[newNum]}</div>;
+    return (
+      <div
+        className={titles[newNum].image ? 'tile has-cover' : 'tile'}
+        key={newNum}
+        style={{ backgroundImage: `url(${titles[newNum].image || ''})` }}
+      >
+        {titles[newNum].title && (
+          <div className="title">{titles[newNum].title}</div>
+        )}
+      </div>
+    );
   }
   return <div className="free">★ FREE ★</div>;
 }
@@ -147,11 +182,7 @@ function generateRandomContent(usedNums, titles) {
 function generateTiles(usedNums, titles) {
   let markup = [];
   for (let i = 0; i < 25; ++i) {
-    markup.push(
-      <div className="tile" key={i}>
-        {generateRandomContent(usedNums, titles)}
-      </div>
-    );
+    markup.push(generateRandomContent(usedNums, titles));
   }
   return markup;
 }
