@@ -202,7 +202,7 @@ function generateCards(numberOfCards, edition, titles) {
     markup.push(
       <div key={i}>
         <h1>Music BINGO</h1>
-        <h2>{edition} Edition</h2>
+        {edition && <h2>{edition} Edition</h2>}
         <Card titles={titles} />
         <div className="page-break" />
       </div>
