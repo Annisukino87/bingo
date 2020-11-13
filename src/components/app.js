@@ -27,7 +27,6 @@ function App() {
       const artists = tracks.reduce((prev, curr) => {
         if (curr.track) {
           const foo = {};
-          debugger;
           if (tileTitle !== 'no-title') {
             if (tileTitle === 'track') {
               foo.title = curr.track.name;
@@ -57,6 +56,10 @@ function App() {
   }
 
   useEffect(() => {
+    const id = sessionStorage.getItem('playlistId');
+    if (id) {
+      setPlaylistId(id);
+    }
     const token = window.location.hash.split('&')[0].split('=')[1];
     if (token) {
       sessionStorage.setItem('token', token);
@@ -107,9 +110,9 @@ function App() {
             <input
               id="playlist-id"
               className="input"
-              type="url"
               onChange={(e) => getPlaylistId(e.target.value)}
               required
+              value={playlistId}
             />
             <label htmlFor="edition">Type of Bingo</label>
             <input
