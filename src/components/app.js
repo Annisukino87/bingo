@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import "../styles.css";
-
+import '../styles.css';
 
 function App() {
   const [generateCard, setGenerateCard] = useState(false);
-  const [edition, setEdition] = useState("");
-  const [playlistId, setPlaylistId] = useState("");
-  const [numberOfCards, setNumberOfCards] = useState(parseInt(sessionStorage.getItem('numberOfCards'))||1);
+  const [edition, setEdition] = useState('');
+  const [playlistId, setPlaylistId] = useState('');
+  const [numberOfCards, setNumberOfCards] = useState(
+    parseInt(sessionStorage.getItem('numberOfCards')) || 1
+  );
   const [titles, setTitles] = useState([]);
+  const [tileTitle, setTileTitle] = useState('artist');
 
   async function fetchPlaylist(token) {
-    const request = new Request(`https://api.spotify.com/v1/playlists/${sessionStorage.getItem('playlistId')}/tracks`);
+    const request = new Request(
+      `https://api.spotify.com/v1/playlists/${sessionStorage.getItem(
+        'playlistId'
+      )}/tracks`
+    );
     var headers = new Headers();
     headers.append('Authorization', `Bearer ${token}`);
     const response = await fetch(request, { headers });
@@ -19,8 +25,12 @@ function App() {
       const tracks = data.items || data.tracks.items || [];
       const artists = tracks.reduce((prev, curr) => {
         if (curr.track) {
-          const artists = curr.track.artists.map(element => element.name);
-          prev.push(artists.join(', '));
+          if (tileTitle === 'track') {
+            prev.push(curr.track.name);
+          } else {
+            const artists = curr.track.artists.map((element) => element.name);
+            prev.push(artists.join(', '));
+          }
         }
         return prev;
       }, []);
@@ -47,44 +57,73 @@ function App() {
 
   function getPlaylistId(url) {
     // TODO: Check if url is valid
-    const [,playlistId] = url.match(/playlist\/([^#?]+)/);
+    const [, playlistId] = url.match(/playlist\/([^#?]+)/);
     setPlaylistId(playlistId);
   }
 
   return (
     <div className="App">
       {generateCard ? (
-        <div>{generateCards(sessionStorage.getItem('numberOfCards'), edition, titles)}</div>
+        <div>
+          {generateCards(
+            sessionStorage.getItem('numberOfCards'),
+            edition,
+            titles
+          )}
+        </div>
       ) : (
         <div>
           <h1>Spotify Playlist Bingo</h1>
-          <form onSubmit={event => {
-            event.preventDefault();
-            const token = sessionStorage.getItem('token');
-            if (token) {
-              fetchPlaylist(token);
-            } else {
-              sessionStorage.setItem('playlistId', playlistId);
-              sessionStorage.setItem('numberOfCards', numberOfCards);
-              sessionStorage.setItem('edition', edition);
-              window.location.href = 'https://accounts.spotify.com/authorize?client_id=c69113b713cb47f985377a26e7e9c3fa&response_type=token&redirect_uri=http://localhost:3000/';
-            }
-          }}>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              const token = sessionStorage.getItem('token');
+              if (token) {
+                fetchPlaylist(token);
+              } else {
+                sessionStorage.setItem('playlistId', playlistId);
+                sessionStorage.setItem('numberOfCards', numberOfCards);
+                sessionStorage.setItem('edition', edition);
+                window.location.href =
+                  'https://accounts.spotify.com/authorize?client_id=c69113b713cb47f985377a26e7e9c3fa&response_type=token&redirect_uri=http://localhost:3000/';
+              }
+            }}
+          >
             <label htmlFor="playlist-id">Playlist ID</label>
-            <input id="playlist-id" className="input" type="url" onChange={e => getPlaylistId(e.target.value)} required/>
+            <input
+              id="playlist-id"
+              className="input"
+              type="url"
+              onChange={(e) => getPlaylistId(e.target.value)}
+              required
+            />
             <label htmlFor="edition">Type of Bingo</label>
-            <input id="edition" className="input" type="text" onChange={e => setEdition(e.target.value)} />
-            <label htmlFor="number-of-cards">Number of Unique Cards to Generate</label>
+            <input
+              id="edition"
+              className="input"
+              type="text"
+              onChange={(e) => setEdition(e.target.value)}
+            />
+            <label htmlFor="number-of-cards">
+              Number of Unique Cards to Generate
+            </label>
             <input
               id="number-of-cards"
               className="input"
               type="number"
               placeholder={numberOfCards}
-              onChange={e => setNumberOfCards(e.target.value)}
+              onChange={(e) => setNumberOfCards(e.target.value)}
             />
-            <button type="submit">
-              Generate {numberOfCards} cards
-            </button>
+            <div>
+              <select
+                value={tileTitle}
+                onChange={({ target }) => setTileTitle(target.value)}
+              >
+                <option value="artist">Artist</option>
+                <option value="track">Track</option>
+              </select>
+            </div>
+            <button type="submit">Generate {numberOfCards} cards</button>
           </form>
         </div>
       )}
@@ -93,13 +132,12 @@ function App() {
 }
 
 function generateRandomContent(usedNums, titles) {
-	let newNum;
-	do {
-		newNum = Math.floor(Math.random() * Math.floor(titles.length));
-	}
-	while (usedNums[newNum]);
+  let newNum;
+  do {
+    newNum = Math.floor(Math.random() * Math.floor(titles.length));
+  } while (usedNums[newNum]);
 
-	usedNums[newNum] = true;
+  usedNums[newNum] = true;
   if (titles[newNum]) {
     return <div className="title">{titles[newNum]}</div>;
   }
@@ -130,7 +168,7 @@ function generateCards(numberOfCards, edition, titles) {
       <div key={i}>
         <h1>Music BINGO</h1>
         <h2>{edition} Edition</h2>
-        <Card titles={titles}/>
+        <Card titles={titles} />
         <div className="page-break" />
       </div>
     );
