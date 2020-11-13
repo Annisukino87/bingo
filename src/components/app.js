@@ -40,7 +40,7 @@ function App() {
               (curr.track.album &&
                 curr.track.album.images &&
                 curr.track.album.images &&
-                curr.track.album.images[0].url) ||
+                curr.track.album.images[1].url) ||
               '';
           }
           prev.push(foo);
@@ -76,6 +76,7 @@ function App() {
     // TODO: Check if url is valid
     const [, playlistId] = url.match(/playlist\/([^#?]+)/);
     setPlaylistId(playlistId);
+    sessionStorage.setItem('playlistId', playlistId);
   }
 
   return (
